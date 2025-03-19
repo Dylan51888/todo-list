@@ -1,4 +1,4 @@
-name: No Plan to Merge
+name: Laravel Pint
 
 on:
   pull_request
