@@ -5,9 +5,14 @@ on:
     types:
       - closed
 
+permissions:  
+  pull-requests: write
+  issues: write
+
 jobs:
   no-plans-to-merge:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == false
 
     steps:
       - name: Checkout repository
@@ -16,6 +21,7 @@ jobs:
       - name: Create a Comment on PR
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.issues.createComment({
               issue_number: context.payload.pull_request.number,
