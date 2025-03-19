@@ -15,7 +15,8 @@ class GameFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array {
+    public function definition(): array
+    {
         return [
             'player_one_id' => User::factory(),
             'player_two_id' => null,
@@ -23,4 +24,4 @@ class GameFactory extends Factory
         ];
     }
 }
-//testing
+// testing
