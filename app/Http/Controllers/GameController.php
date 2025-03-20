@@ -6,6 +6,7 @@ use App\Events\GameJoined;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 class GameController extends Controller
 {
@@ -73,23 +74,57 @@ class GameController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(Request $request, Game $game)
+    // {
+    //     $data = $request->validate([
+    //         'state' => ['required', 'array', 'size:9'],
+    //         'state.*' => ['integer', 'between:-1,1'],
+    //     ]);
+
+    //     $game->update($data);
+
+    //     return to_route('games.show', $game);
+    // }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+
+
+
     public function update(Request $request, Game $game)
     {
         $data = $request->validate([
-            'state' => ['required', 'array', 'size:9'],
+            'state'   => ['required', 'array', 'size:9'],
             'state.*' => ['integer', 'between:-1,1'],
         ]);
+
+
+        $oldState = $game->state;
+        $newState = $data['state'];
+
+
+        $counts = 0;
+        for ($i = 0; $i < 9; $i++) {
+            if ($oldState[$i] !== $newState[$i]) {
+                $counts++;
+            }
+        }
+        if ($counts > 1) {
+
+            return response()->json([
+                'message' => 'You cannot change multiple squares in one turn.',
+            ], 422);
+        }
 
         $game->update($data);
 
         return to_route('games.show', $game);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Game $game)
     {
         //
     }
+
 }

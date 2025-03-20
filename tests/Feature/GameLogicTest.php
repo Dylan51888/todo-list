@@ -51,3 +51,13 @@ class GameLogicTest extends TestCase
         );
     }
 }
+
+// let ch = Echo.private("presence-games.17")
+// ch.whisper("foo", {})
+// ch = Echo.channel("presence-games.17")
+// ch.whisper("client-PlayerMadeMove", {state: [-1, 0, 0, 0, -1, 0, 0, 0, -1]})
+// ch.whisper("PlayerMadeMove", {state: [-1, 0, 0, 0, -1, 0, 0, 0, -1]})
+// temp1
+// temp2
+// temp3
+// temp1.click(); temp2.click(); temp3.click()
