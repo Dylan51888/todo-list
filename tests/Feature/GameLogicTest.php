@@ -15,12 +15,10 @@ class GameLogicTest extends TestCase
     public function test_cannot_cheat_in_console_by_making_multiple_moves_in_one_turn()
     {
         /** @var \App\Models\User $playerX */
-        
+
         $playerX = User::factory()->create();
         $playerO = User::factory()->create();
         //set the two player
-
-       
 
         $game = Game::factory()->create([
             'player_one_id' => $playerX->id,
@@ -34,6 +32,7 @@ class GameLogicTest extends TestCase
                 'state' => [-1, 0, 0, 0, 0, 0, 0, 0, 0],
             ]);
 
+       
         $response1->assertStatus(302);
 
         $cheatResponse = $this
