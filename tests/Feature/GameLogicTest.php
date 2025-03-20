@@ -34,8 +34,6 @@ class GameLogicTest extends TestCase
                 'state' => [-1, 0, 0, 0, 0, 0, 0, 0, 0],
             ]);
 
-       
-
         $response1->assertStatus(302);
 
         $cheatResponse = $this
