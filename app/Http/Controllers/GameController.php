@@ -35,9 +35,20 @@ class GameController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(Request $request)
+    // {
+    //     $game = Game::create(['player_one_id' => $request->user()->id]);
+
+    //     return to_route('games.show', $game);
+    // }
+
     public function store(Request $request)
     {
-        $game = Game::create(['player_one_id' => $request->user()->id]);
+        $game = Game::create([
+            'player_one_id' => $request->user()->id,
+
+            'state' => [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ]);
 
         return to_route('games.show', $game);
     }
