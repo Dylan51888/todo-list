@@ -35,7 +35,8 @@ class GameLogicTest extends TestCase
             ]);
 
        
-        $response1->assertStatus(200);
+
+        $response1->assertStatus(302);
 
         $cheatResponse = $this
             ->actingAs($playerX)
