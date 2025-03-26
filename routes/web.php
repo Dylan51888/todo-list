@@ -26,6 +26,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/task-lists', [TaskListController::class, 'index'])->name('task-lists.index');
 Route::post('/task-lists', [TaskListController::class, 'store'])->name('task-lists.store');
+
 Route::put('/task-lists/{taskList}', [TaskListController::class, 'update'])->name('task-lists.update');
 Route::delete('/task-lists/{taskList}', [TaskListController::class, 'destroy'])->name('task-lists.destroy');
 Route::get('/task-lists/{taskList}', [TaskListController::class, 'show'])->name('task-lists.show');

@@ -10,17 +10,22 @@
         </button>
       </div>
   
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="list in taskLists"
-          :key="list.id"
-          class="bg-white p-4 shadow rounded hover:shadow-lg"
-        >
-          <h2 class="text-lg font-semibold">{{ list.name }}</h2>
-          <div class="flex gap-2 mt-3">
-            <button @click="editList(list)" class="text-blue-500">Edit</button>
-            <button @click="deleteList(list.id)" class="text-red-500">Delete</button>
-          </div>
+      <div
+        v-for="list in taskLists"
+        :key="list.id"
+        class="bg-white p-4 shadow rounded hover:shadow-lg"
+      >
+        <h2 class="text-lg font-semibold">
+          <input
+            type="checkbox"
+            :checked="list.checked"
+            @change="toggleChecked(list)"
+          />
+          {{ list.name }}
+        </h2>
+        <div class="flex gap-2 mt-3">
+          <button @click="editList(list)" class="text-blue-500">Edit</button>
+          <button @click="deleteList(list.id)" class="text-red-500">Delete</button>
         </div>
       </div>
   
@@ -53,50 +58,76 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  
-  const taskLists = ref([])
-  const showCreateModal = ref(false)
-  const listName = ref('')
-  const editingList = ref(null)
-  
-  const fetchTaskLists = async () => {
-    const res = await axios.get('/task-lists')
-    taskLists.value = res.data
+import { ref, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+
+
+const props = defineProps({
+  taskLists: {
+    type: Array,
+    default: () => []
   }
-  
-  const submitList = async () => {
-    if (!listName.value) return
-  
-    if (editingList.value) {
-      await axios.put(`/task-lists/${editingList.value.id}`, {
-        name: listName.value
-      })
-    } else {
-      await axios.post('/task-lists', { name: listName.value })
+})
+
+const taskLists = ref(props.taskLists)
+const showCreateModal = ref(false)
+const listName = ref('')
+const editingList = ref(null)
+
+const toggleChecked = (list) => {
+  const newValue = !list.checked
+  router.put(route('task-lists.update', list.id), {
+    name: list.name,
+    checked: newValue
+  }, {
+    onSuccess: () => {
+      list.checked = newValue 
     }
-  
-    await fetchTaskLists()
-    closeModal()
+  })
+}
+
+
+const submitList = () => {
+  if (!listName.value) return
+
+  if (editingList.value) {
+
+    router.put(route('task-lists.update', editingList.value.id), {
+      name: listName.value
+    }, {
+      onSuccess: () => {
+        closeModal()
+
+      }
+    })
+  } else {
+
+    router.post(route('task-lists.store'), {
+      name: listName.value
+    }, {
+      onSuccess: () => {
+        closeModal()
+      }
+    })
   }
-  
-  const deleteList = async (id) => {
-    await axios.delete(`/task-lists/${id}`)
-    await fetchTaskLists()
-  }
-  
-  const editList = (list) => {
-    editingList.value = list
-    listName.value = list.name
-    showCreateModal.value = true
-  }
-  
-  const closeModal = () => {
-    listName.value = ''
-    editingList.value = null
-    showCreateModal.value = false
-  }
-  
-  onMounted(fetchTaskLists)
-  </script>
+}
+
+
+const deleteList = (id) => {
+  router.delete(route('task-lists.destroy', id))
+}
+
+
+const editList = (list) => {
+  editingList.value = list
+  listName.value = list.name
+  showCreateModal.value = true
+}
+
+
+const closeModal = () => {
+  listName.value = ''
+  editingList.value = null
+  showCreateModal.value = false
+}
+</script>

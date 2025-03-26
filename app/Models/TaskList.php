@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class TaskList extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'checked'];
+    
 }
