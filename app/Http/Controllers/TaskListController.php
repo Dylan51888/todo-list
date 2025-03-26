@@ -10,10 +10,10 @@ class TaskListController extends Controller
 {
     public function index()
     {
-        $taskLists = TaskList::all();
+        $taskList = TaskList::all();
 
         return Inertia::render('Dashboard', [
-            'taskLists' => $taskLists,
+            'taskList' => $taskList,
         ]);
     }
 

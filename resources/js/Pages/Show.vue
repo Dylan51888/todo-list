@@ -11,7 +11,7 @@
       </div>
   
       <div
-        v-for="list in taskLists"
+        v-for="list in taskList"
         :key="list.id"
         class="bg-white p-4 shadow rounded hover:shadow-lg"
       >
@@ -21,7 +21,7 @@
             :checked="list.checked"
             @change="toggleChecked(list)"
           />
-          {{ list.name }}
+          {{ props.taskList.name }}
         </h2>
         <div class="flex gap-2 mt-3">
           <button @click="editList(list)" class="text-blue-500">Edit</button>
@@ -29,7 +29,10 @@
         </div>
       </div>
   
-
+      <!-- <h1 class="text-2xl font-bold">
+        Task List: {{ props.taskList.name }}
+        <span v-if="props.taskList.checked" class="text-green-500 ml-2">(✔ Completed)</span>
+      </h1> -->
       <div
         v-if="showCreateModal"
         class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center"
@@ -62,14 +65,13 @@ import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 
 
+
+
 const props = defineProps({
-  taskLists: {
-    type: Array,
-    default: () => []
-  }
+  taskList: Object  
 })
 
-const taskLists = ref(props.taskLists)
+const taskList = ref(props.taskList)
 const showCreateModal = ref(false)
 const listName = ref('')
 const editingList = ref(null)
