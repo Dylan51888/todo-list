@@ -10,32 +10,32 @@ class TaskListController extends Controller
 {
     public function index()
     {
-        $taskList = TaskList::all();
-
+        $taskLists = TaskList::all();
         return Inertia::render('Dashboard', [
-            'taskList' => $taskList,
+            'taskLists' => $taskLists,
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+    
+        $taskList = TaskList::create(['name' => $request->name]);
 
-public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-    ]);
-
-    $taskList = TaskList::create(['name' => $request->name]);
-
-    return redirect()->route('task-lists.show', $taskList->id);
-}
+        return Inertia::render('Show', [
+            'taskList' => $taskList,
+        ]);
+    }
+    
     public function show(TaskList $taskList)
     {
         return Inertia::render('Show', [
             'taskList' => $taskList,
         ]);
     }
-
-
+    
     public function update(Request $request, TaskList $taskList)
     {
         $request->validate([
@@ -52,11 +52,11 @@ public function store(Request $request)
     
         return response()->json($taskList);
     }
+    
     public function destroy(TaskList $taskList)
     {
         $taskList->delete();
     
-
         broadcast(new TaskListUpdated($taskList));
     
         return response()->json(['message' => 'Deleted']);
