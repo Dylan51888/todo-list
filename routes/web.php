@@ -17,9 +17,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    $taskLists = TaskList::all();
+    $taskList = TaskList::all();
     return Inertia::render('Dashboard', [
-        'taskLists' => $taskLists,
+        'taskList' => $taskList,
     ]);
 })->name('dashboard');
 
