@@ -31,13 +31,11 @@
                 <span>{{ list.name }}</span>
                 <div class="space-x-3">
                   <Link
-                    :href="route('task-lists.show', list.id)"
+                    :href="route('task-lists.show', {taskLists:list.id})"
                     class="text-green-600 hover:text-green-800"
                   >
                     View
                   </Link>
-  
-
                 </div>
               </li>
             </ul>
@@ -48,16 +46,16 @@
   </template>
   
   <script setup>
-  import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-  import { Head, Link } from '@inertiajs/vue3'
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head, Link } from '@inertiajs/vue3'
+    import { ref, onMounted } from 'vue'
+    import axios from 'axios'
 
-  const taskLists = ref([])
-  const fetchTaskLists = async () => {
-    const res = await axios.get('/task-lists')
-    taskLists.value = res.data
-    }
+    const taskLists = ref([])
+    const fetchTaskLists = async () => {
+        const res = await axios.get('/task-lists')
+        taskLists.value = res.data
+        }
 
     onMounted(() => {
     fetchTaskLists()
@@ -67,10 +65,10 @@
         fetchTaskLists()
         })
     })
-  const props = defineProps({
-    taskLists: {
-      type: Array,
-      default: () => []
-    }
-  })
+    const props = defineProps({
+        taskLists: {
+        type: Array,
+        default: () => []
+        }
+    })
   </script>

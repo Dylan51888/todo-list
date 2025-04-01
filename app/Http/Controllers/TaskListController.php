@@ -22,42 +22,43 @@ class TaskListController extends Controller
             'name' => 'required|string|max:255',
         ]);
     
-        $taskList = TaskList::create(['name' => $request->name]);
+        $taskLists = TaskList::create(['name' => $request->name]);
 
         return Inertia::render('Show', [
-            'taskList' => $taskList,
+            'taskLists' => $taskLists,
         ]);
     }
     
-    public function show(TaskList $taskList)
+    public function show(TaskList $taskLists)
     {
+        $taskLists->load('tasks'); 
         return Inertia::render('Show', [
-            'taskList' => $taskList,
+            'taskLists' => $taskLists,
         ]);
     }
-    
-    public function update(Request $request, TaskList $taskList)
+
+    public function update(Request $request, TaskList $taskLists)
     {
         $request->validate([
             'name' => 'required|string',
             'checked' => 'boolean'
         ]);
     
-        $taskList->update([
+        $taskLists->update([
             'name' => $request->name,
             'checked' => $request->checked ?? false,
         ]);
     
-        broadcast(new TaskListUpdated($taskList));
+        broadcast(new TaskListUpdated($taskLists));
     
-        return response()->json($taskList);
+        return response()->json($taskLists);
     }
     
-    public function destroy(TaskList $taskList)
+    public function destroy(TaskList $taskLists)
     {
-        $taskList->delete();
+        $taskLists->delete();
     
-        broadcast(new TaskListUpdated($taskList));
+        broadcast(new TaskListUpdated($taskLists));
     
         return response()->json(['message' => 'Deleted']);
     }
