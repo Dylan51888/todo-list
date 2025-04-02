@@ -3,17 +3,15 @@
 namespace App\Events;
 
 use App\Models\TaskList;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel; 
-use Illuminate\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
-class TaskListUpdated implements ShouldBroadcastNow
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public TaskList $taskList;
+class TaskListUpdated implements ShouldBroadcast
+{
+    use SerializesModels;
+
+    public $taskList;
 
     public function __construct(TaskList $taskList)
     {
@@ -22,8 +20,7 @@ class TaskListUpdated implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new PresenceChannel('task-lists'); 
-
+        return new Channel('task-lists');
     }
 
     public function broadcastAs()

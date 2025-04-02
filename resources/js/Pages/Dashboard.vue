@@ -30,12 +30,12 @@
               >
                 <span>{{ list.name }}</span>
                 <div class="space-x-3">
-                  <Link
-                    :href="route('task-lists.show', {taskLists:list.id})"
+                <Link
+                    :href="route('task-lists.show', { taskList: list.id })"
                     class="text-green-600 hover:text-green-800"
-                  >
+                    >
                     View
-                  </Link>
+                </Link>
                 </div>
               </li>
             </ul>
@@ -52,10 +52,17 @@
     import axios from 'axios'
 
     const taskLists = ref([])
+
     const fetchTaskLists = async () => {
-        const res = await axios.get('/task-lists')
-        taskLists.value = res.data
+    const res = await axios.get('/task-lists', {
+        headers: {
+        'X-Inertia': true,
+        'Accept': 'application/json'
         }
+    });
+    console.log(res.data); 
+    taskLists.value = res.data.props.taskLists;
+    }
 
     onMounted(() => {
     fetchTaskLists()

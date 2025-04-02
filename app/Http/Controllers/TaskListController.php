@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Events\TaskListUpdated;
 class TaskListController extends Controller
+
 {
     public function index()
     {
@@ -14,6 +15,7 @@ class TaskListController extends Controller
         return Inertia::render('Dashboard', [
             'taskLists' => $taskLists,
         ]);
+
     }
 
     public function store(Request $request)
@@ -29,11 +31,11 @@ class TaskListController extends Controller
         ]);
     }
     
-    public function show(TaskList $taskLists)
+    public function show(TaskList $taskList)
     {
-        $taskLists->load('tasks'); 
+        $taskList->load('tasks'); 
         return Inertia::render('Show', [
-            'taskLists' => $taskLists,
+            'taskList' => $taskList,
         ]);
     }
 
