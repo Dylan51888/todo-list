@@ -40,29 +40,30 @@ class TaskListController extends Controller
     }
 
 
-    public function update(Request $request, TaskList $taskLists)
+    public function update(Request $request, TaskList $taskList)
     {
         $request->validate([
             'name' => 'required|string',
             'checked' => 'boolean'
         ]);
     
-        $taskLists->update([
+        $taskList->update([
             'name' => $request->name,
             'checked' => $request->checked ?? false,
         ]);
     
-        broadcast(new TaskListUpdated($taskLists));
+        broadcast(new TaskListUpdated($taskList));
     
-        return response()->json($taskLists);
+        return response()->json($taskList);
     }
     
-    public function destroy(TaskList $taskLists)
+
+    public function destroy(TaskList $taskList)
     {
-        $taskLists->delete();
-    
-        broadcast(new TaskListUpdated($taskLists));
-    
-        return response()->json(['message' => 'Deleted']);
+        $taskList->delete();
+
+        broadcast(new TaskListUpdated($taskList));
+
+        return redirect()->route('dashboard');
     }
 }
