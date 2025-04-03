@@ -30,7 +30,24 @@ class TaskListController extends Controller
         return redirect()->route('dashboard');
     }
 
+    public function storeTask(Request $request, TaskList $taskList)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+
+        $task = $taskList->tasks()->create([
+            'name' => $request->name,
+            'isDone' => false,
+        ]);
+
+        broadcast(new TaskListUpdated($taskList));
+
     
+        return redirect()->route('task-lists.show', $taskList->id);
+    }
+
     public function show(TaskList $taskList)
     {
         $taskList->load('tasks'); 

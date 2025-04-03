@@ -2,10 +2,8 @@
   <div class="container d-flex justify-content-center align-items-center">
     <div class="card mt-3 col-6">
       <div class="card-body">
-        <h1 class="text-center">Task List</h1>
-        <div
-          class="d-flex flex-column flex-sm-row justify-content-between mt-3 mt-sm-5"
-        >
+        <h1 class="text-center">Task List of {{ taskList.name }}</h1>
+        <div class="d-flex flex-column flex-sm-row justify-content-between mt-3 mt-sm-5">
           <div class="col-sm-9">
             <input
               type="text"
@@ -13,7 +11,7 @@
               placeholder="Add a new task..."
               v-model="newTask"
               @keyup.enter="addTask"
-              :disabled="tasks.length > 10"
+              :disabled="tasks.length >= maxTasks"
             />
           </div>
           <div class="mt-3 mt-sm-0">
@@ -21,7 +19,7 @@
               type="button"
               class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               @click="addTask"
-              v-if="tasks.length <= 10"
+              v-if="tasks.length < maxTasks"
             >
               Add
             </button>
@@ -31,8 +29,8 @@
         <div class="mt-3 mt-sm-5">
           <div
             class="card item-card mt-2"
-            v-for="(task, index) in tasks"
-            :key="index"
+            v-for="task in tasks"
+            :key="task.id"
           >
             <div class="card-body">
               <div class="d-flex justify-content-between">
@@ -40,15 +38,16 @@
                   class="form-check-input"
                   type="checkbox"
                   v-model="task.isDone"
+                  @change="updateTask(task)"
                 />
                 <div>
-                  <p class="fw-semibold">{{ task.description }}</p>
+                  <p class="fw-semibold">{{ task.name }}</p>
                 </div>
                 <div>
                   <button
                     type="button"
                     class="text-blue-500"
-                    @click="deleteTask(index)"
+                    @click="deleteTask(task.id)"
                   >
                     Delete
                   </button>
@@ -87,94 +86,109 @@
     </div>
   </div>
 </template>
-<script >
-import { ref, onMounted, computed, watch } from "vue";
-import { Head, Link } from '@inertiajs/vue3'
-window.Echo.join('task-lists')
-    .listen('.TaskListUpdated', (e) => {
-        fetchTaskLists();
-    });
-export default {
-  name: "HomePage",
-  components: {
-    Head,
-    Link,
-  },
-  setup() {
-    const newTask = ref("");
-    const tasks = ref([
-      { description: "Review pending activities", isDone: false },
-      { description: "Attend daily meetings", isDone: false },
-    ]);
 
-    const addTask = () => {
-      if (!newTask.value) return;
-      tasks.value.unshift({
-        description: newTask.value,
-        isDone: false,
-      });
-      localStorage.setItem("tasks", JSON.stringify(tasks.value));
-      newTask.value = "";
-    };
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useForm, Link, router } from '@inertiajs/vue3';
 
-    const deleteTask = (index) => {
-      tasks.value.splice(index, 1);
-      localStorage.setItem("tasks", JSON.stringify(tasks.value));
-    };
+const props = defineProps({
+  taskLists: {
+    type: Object,
+    default: () => ({ tasks: [], name: '' })
+  }
+});
 
-    const deleteAllTasks = () => {
-      tasks.value = [];
-      localStorage.removeItem("tasks");
-    };
+const taskList = props.taskLists;
+const maxTasks = 10;
+const tasks = ref(taskList.tasks || []);
+const newTask = ref('');
 
-    const pendingTasks = computed(() => {
-      return tasks.value.filter((x) => x.isDone === false).length;
-    });
+function reloadTasks() {
+  router.reload({ only: ['taskLists'] });
+}
 
-    watch(
-      tasks,
-      () => {
-        if (tasks.value.length > 10) {
-          alert('You have reached the maximum number of possible tasks (5)');
-        }
-      },
-      { deep: true }
-    );
-
-    onMounted(() => {
-      if (localStorage.tasks) {
-        tasks.value = JSON.parse(localStorage.getItem("tasks")) || [];
+function addTask() {
+  if (!newTask.value) return;
+  router.post(
+    route('task-lists.tasks.store', taskList.id),
+    {
+      name: newTask.value,
+      isDone: false,
+    },
+    {
+      preserveState: true,
+      onSuccess: () => {
+        newTask.value = '';
+        reloadTasks();
       }
-    });
+    }
+  );
+}
 
-    return {
-      newTask,
-      tasks,
-      addTask,
-      deleteTask,
-      deleteAllTasks,
-      pendingTasks,
-    };
-  },
-};
+function updateTask(task) {
+  router.put(
+    route('task-lists.update', taskList.id),
+    {
+      name: task.name,
+      isDone: task.isDone,
+    },
+    {
+      preserveState: true,
+      onSuccess: () => {
+        reloadTasks();
+      }
+    }
+  );
+}
+
+function deleteTask(id) {
+  router.delete(
+    route('tasks.destroy', id),
+    {},
+    {
+      preserveState: true,
+      onSuccess: () => {
+        reloadTasks();
+      }
+    }
+  );
+}
+
+function deleteAllTasks() {
+  router.delete(
+    route('task-lists.tasks.destroy', taskList.id),
+    {},
+    {
+      preserveState: true,
+      onSuccess: () => {
+        reloadTasks();
+      }
+    }
+  );
+}
+
+const pendingTasks = computed(() => tasks.value.filter(task => !task.isDone).length);
+
+onMounted(() => {
+  reloadTasks();
+  if (window.Echo) {
+    window.Echo.channel('task-lists')
+      .listen('TaskListUpdated', (_event) => {
+        reloadTasks();
+      });
+  }
+});
 </script>
 
 <style scoped>
 .card-body h1 {
   color: black;
 }
-
 .btn-dashboard {
   cursor: pointer;
 }
-.btn-danger {
-  background-color: #5f8dba;
-  border: transparent;
-}
-
 .message {
   color: green;
   font-weight: bold;
 }
-
 </style>
