@@ -23,21 +23,21 @@ class TaskListController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
-    
-        $taskLists = TaskList::create(['name' => $request->name]);
 
-        return Inertia::render('Show', [
-            'taskLists' => $taskLists,
-        ]);
+        TaskList::create(['name' => $request->name]);
+
+        return redirect()->route('dashboard');
     }
+
     
     public function show(TaskList $taskList)
     {
         $taskList->load('tasks'); 
         return Inertia::render('Show', [
-            'taskList' => $taskList,
+            'taskLists' => $taskList,
         ]);
     }
+
 
     public function update(Request $request, TaskList $taskLists)
     {

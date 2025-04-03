@@ -74,10 +74,6 @@
                 Delete All
               </button>
             </div>
-            <!-- <Link 
-            :href="route('profile.edit')" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded">
-              Back to Dashboard
-            </Link> -->
             <Link
               :href="route('dashboard')"
               as="button"
