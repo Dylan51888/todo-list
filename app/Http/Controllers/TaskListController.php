@@ -54,7 +54,8 @@ class TaskListController extends Controller
     
         broadcast(new TaskListUpdated($taskList));
     
-        return response()->json($taskList);
+        return redirect()->route('dashboard');
+        
     }
     
 
