@@ -16,6 +16,12 @@
   
       <ul>
         <li v-for="list in taskLists" :key="list.id" class="mb-2 flex items-center justify-between">
+        <input
+          type="checkbox"
+          :checked="list.checked"
+          @change="toggleChecked(list)"
+          class="mr-2"
+        />
           <span>{{ list.name }}</span>
           <Link :href="route('task-lists.show', list.id)" class="text-blue-500 hover:underline">
             View
@@ -40,6 +46,14 @@
     name: ''
   });
   
+  function toggleChecked(list) {
+    const updatedChecked = !list.checked;
+    Inertia.put(route('task-lists.update', list.id), {
+        name: list.name,
+        checked: updatedChecked
+    });
+    }
+
   function submit() {
     form.post(route('task-lists.store'), {
       onSuccess: () => {

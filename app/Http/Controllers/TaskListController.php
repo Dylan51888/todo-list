@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TaskList;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Events\TaskListUpdated;
@@ -24,7 +25,7 @@ class TaskListController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        TaskList::create(['name' => $request->name]);
+        Task::create(['name' => $request->name]);
 
         return redirect()->route('dashboard');
     }
