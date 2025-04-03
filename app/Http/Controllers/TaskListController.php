@@ -12,9 +12,9 @@ class TaskListController extends Controller
 {
     public function index()
     {
-        $taskLists = TaskList::all();
+        $taskList = TaskList::all();
         return Inertia::render('Dashboard', [
-            'taskLists' => $taskLists,
+            'taskLists' => $taskList,
         ]);
 
     }
@@ -25,7 +25,7 @@ class TaskListController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        Task::create(['name' => $request->name]);
+        TaskList::create(['name' => $request->name]);
 
         return redirect()->route('dashboard');
     }
