@@ -25,7 +25,8 @@ class TaskListController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        TaskList::create(['name' => $request->name]);
+        $taskList = TaskList::create(['name' => $request->name]);
+        broadcast(new TaskListUpdated($taskList, 'created'));
 
         return redirect()->route('dashboard');
     }
@@ -42,7 +43,7 @@ class TaskListController extends Controller
             'isDone' => false,
         ]);
 
-        broadcast(new TaskListUpdated($taskList));
+        broadcast(new TaskListUpdated($taskList, 'task_created'));
 
     
         return redirect()->route('task-lists.show', $taskList->id);
@@ -69,7 +70,7 @@ class TaskListController extends Controller
             'checked' => $request->checked ?? false,
         ]);
     
-        broadcast(new TaskListUpdated($taskList));
+        broadcast(new TaskListUpdated($taskList, 'updated'));
     
         return redirect()->route('dashboard');
         
@@ -80,9 +81,8 @@ class TaskListController extends Controller
     {
         $taskList->delete();
 
-        broadcast(new TaskListUpdated($taskList));
+        broadcast(new TaskListUpdated($taskList, 'deleted'));
 
         return redirect()->route('dashboard');
     }
 }
-

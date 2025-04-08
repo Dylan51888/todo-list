@@ -98,19 +98,19 @@ const props = defineProps({
   }
 });
 
-const taskList = props.taskLists;
+const taskList = ref({ ...props.taskLists });
 const maxTasks = 10;
-const tasks = ref(taskList.tasks || []);
+const tasks = ref(taskList.value.tasks || []);
 const newTask = ref('');
-
-function reloadTasks() {
-  router.reload({ only: ['taskLists'] });
-}
 
 function addTask() {
   if (!newTask.value) return;
+  const tempId = Date.now();
+  const newTaskItem = { id: tempId, name: newTask.value, isDone: false };
+  tasks.value.push(newTaskItem);
+  
   router.post(
-    route('task-lists.tasks.store', taskList.id),
+    route('task-lists.tasks.store', taskList.value.id),
     {
       name: newTask.value,
       isDone: false,
@@ -119,7 +119,6 @@ function addTask() {
       preserveState: true,
       onSuccess: () => {
         newTask.value = '';
-        reloadTasks();
       }
     }
   );
@@ -127,28 +126,27 @@ function addTask() {
 
 function updateTask(task) {
   router.put(
-    route('task-lists.update', taskList.id),
+    route('task-lists.update', taskList.value.id),
     {
       name: task.name,
       isDone: task.isDone,
     },
     {
       preserveState: true,
-      onSuccess: () => {
-        reloadTasks();
-      }
+      onSuccess: () => {}
     }
   );
 }
 
 function deleteTask(id) {
+
+  tasks.value = tasks.value.filter(task => task.id !== id);
   router.delete(
     route('tasks.destroy', id),
     {},
     {
       preserveState: true,
       onSuccess: () => {
-        reloadTasks();
       }
     }
   );
@@ -156,13 +154,11 @@ function deleteTask(id) {
 
 function deleteAllTasks() {
   router.delete(
-    route('task-lists.tasks.destroy', taskList.id),
+    route('task-lists.tasks.destroy', taskList.value.id),
     {},
     {
       preserveState: true,
-      onSuccess: () => {
-        reloadTasks();
-      }
+      onSuccess: () => {}
     }
   );
 }
@@ -170,11 +166,13 @@ function deleteAllTasks() {
 const pendingTasks = computed(() => tasks.value.filter(task => !task.isDone).length);
 
 onMounted(() => {
-  reloadTasks();
   if (window.Echo) {
     window.Echo.channel('task-lists')
-      .listen('TaskListUpdated', (_event) => {
-        reloadTasks();
+      .listen('TaskListUpdated', (event) => {
+        if (event.taskList.id === taskList.value.id) {
+          taskList.value = event.taskList;
+          tasks.value = event.taskList.tasks || [];
+        }
       });
   }
 });
@@ -182,13 +180,31 @@ onMounted(() => {
 
 <style scoped>
 .card-body h1 {
-  color: black;
+  color: #1f2937;
+  font-size: 1.75rem;
+  font-weight: 600;
 }
 .btn-dashboard {
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-dashboard:hover {
+  background-color: #4b5563;
 }
 .message {
-  color: green;
+  color: #10b981;
   font-weight: bold;
+  font-size: 1rem;
+}
+.card.item-card {
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.card.item-card:hover {
+  background-color: #f3f4f6;
+}
+input.form-check-input {
+  cursor: pointer;
 }
 </style>

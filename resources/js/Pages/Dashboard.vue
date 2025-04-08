@@ -1,4 +1,4 @@
-  <template>
+<template>
     <div class="container mx-auto p-4">
       <h1 class="text-2xl font-bold mb-4">Task Lists Dashboard</h1>
   
@@ -16,7 +16,7 @@
   
       <ul>
         <li
-          v-for="list in taskLists"
+          v-for="list in localTaskLists"
           :key="list.id"
           class="mb-2 flex items-center justify-between"
         >
@@ -58,6 +58,8 @@
   const form = useForm({
     name: '',
   });
+
+  const localTaskLists = ref([...props.taskLists]);
   
   function toggleChecked(list) {
     const updatedChecked = !list.checked;
@@ -69,35 +71,67 @@
   }
   
   function deleteList(list) {
-    if (confirm('Are you sure you want to delete this list?')) {
-
-      router.delete(route('task-lists.destroy', list.id));
-    }
-  }
-  
-  function submit() {
-    form.post(route('task-lists.store'), {
+  if (confirm('Are you sure you want to delete this list?')) {
+    localTaskLists.value = localTaskLists.value.filter(item => item.id !== list.id);
+    router.delete(route('task-lists.destroy', list.id), {
+      preserveState: true,
       onSuccess: () => {
-        form.reset();
-      },
+      }
     });
   }
+}
+  
+function submit() {
+  const tempId = Date.now();
+  const newList = { id: tempId, name: form.name, checked: false };
+  localTaskLists.value.push(newList);
+  form.post(route('task-lists.store'), {
+    preserveState: true,
+    onSuccess: () => {
+      form.reset();
+    }
+  });
+}
 
-
-
-    onMounted(() => {
+  onMounted(() => {
     if (window.Echo) {
-        window.Echo.channel('task-lists')
-        .listen('TaskListUpdated', (_event) => {
-            router.reload({ only: ['taskLists'] });
+      window.Echo.channel('task-lists')
+        .listen('TaskListUpdated', (event) => {
+          if (event.action === 'deleted') {
+            localTaskLists.value = localTaskLists.value.filter(item => item.id !== event.taskList.id);
+          } else if (event.action === 'created') {
+            localTaskLists.value.push(event.taskList);
+          } else if (event.action === 'updated') {
+            const index = localTaskLists.value.findIndex(item => item.id === event.taskList.id);
+            if (index !== -1) {
+              localTaskLists.value[index] = event.taskList;
+            }
+          }
         });
     }
-    });
-
+  });
 
   </script>
   
   <style scoped>
-
+.container {
+  max-width: 800px;
+}
+input[type="text"] {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-width: 200px;
+}
+button {
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  filter: brightness(90%);
+}
+li {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
   </style>
-  

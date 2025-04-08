@@ -32,9 +32,9 @@ Route::prefix('task-lists')->group(function () {
     Route::put('/{taskList}', [TaskListController::class, 'update'])->name('task-lists.update');
     Route::delete('/{taskList}', [TaskListController::class, 'destroy'])->name('task-lists.destroy');
     
-    Route::post('/task-lists/{taskList}/tasks', [TaskListController::class, 'storeTask'])->name('task-lists.tasks.store');
-    Route::put('/{taskList}/tasks', [TaskListController::class, 'update'])->name('task-lists.tasks.update');
-    Route::delete('/{taskList}/tasks', [TaskListController::class, 'destroyAll'])->name('task-lists.tasks.destroy');
+    Route::post('/{taskList}/tasks', [TaskListController::class, 'storeTask'])->name('task-lists.tasks.store');
+    Route::put('/{taskList}/tasks/{task}', [TaskListController::class, 'updateTask'])->name('task-lists.tasks.update');
+    Route::delete('/{taskList}/tasks', [TaskListController::class, 'destroyAllTasks'])->name('task-lists.tasks.destroy');
 });
 
 Route::middleware('auth')->group(function () {
